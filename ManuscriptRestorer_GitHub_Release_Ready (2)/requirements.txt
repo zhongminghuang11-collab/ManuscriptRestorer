@@ -1,0 +1,4 @@
+Pillow>=10.0,<13
+numpy>=1.26,<3
+pytesseract>=0.3.10,<1
+pypdfium2>=5.0,<6

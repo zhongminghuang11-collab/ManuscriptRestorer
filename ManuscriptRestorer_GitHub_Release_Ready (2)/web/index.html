@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light"><title>ManuscriptRestorer 1.0 · 手稿修改还原</title>
+<link rel="stylesheet" href="/web/style.css"><script src="/web/app.js" defer></script>
+</head>
+<body>
+<header class="hero"><div class="headwrap"><div>
+<span class="eyebrow">MANUSCRIPTRESTORER / VERSION 1.0</span>
+<h1>手稿修改还原系统</h1><p class="intro">图片或扫描 PDF → 本地 OCR → 修改证据核对 → 原稿、终稿与修改轨迹。保留不确定性，不擅自猜写。</p>
+</div><span class="chip">本机处理 · 修改人工确认</span></div></header>
+<main class="workspace">
+<section class="toolbar" aria-label="项目管理">
+<label class="upload-btn btn-primary">📷 导入图片（可多张）<input id="upload" type="file" multiple accept="image/png,image/jpeg,image/webp" hidden></label>
+<label class="upload-btn">📄 导入PDF<input id="uploadPdf" type="file" accept="application/pdf,.pdf" hidden></label>
+<button id="demoBtn">加载演示</button>
+<input id="projectName" style="max-width:260px" aria-label="项目名称" placeholder="项目名称" value="未命名手稿">
+<button id="saveProject" class="btn-primary">保存到本机</button>
+<button id="loadProject">打开已保存项目</button>
+<label class="upload-btn">导入项目JSON<input id="importProject" type="file" accept="application/json,.json" hidden></label>
+<button id="exportProject">导出项目JSON</button>
+<button id="undoBtn" title="撤销本页操作">↶ 撤销</button><button id="redoBtn" title="重做本页操作">↷ 重做</button>
+</section>
+<section class="panel pagepanel">
+ <div class="panel-head"><div><h2>文档页面</h2><p>可以一次导入多张图片或PDF；每页的文字框和修改记录相互独立。</p></div>
+ <div class="inline-form"><button id="prevPage">上一页</button><span id="pageIndex" class="tag">0 / 0</span><button id="nextPage">下一页</button><button id="removePage" class="danger">删除本页</button></div></div>
+ <div id="pageTabs" class="page-tabs"></div>
+</section>
+<section class="toolbar" aria-label="OCR操作">
+ <label>OCR引擎<select id="ocrEngine"><option value="auto">自动优选</option><option value="tesseract">Tesseract（轻量）</option><option value="paddle">PaddleOCR（可选）</option></select></label>
+ <label class="checkline"><input id="ocrRegion" type="checkbox">只识别绿色选区</label>
+ <label class="checkline"><input id="removeRed" type="checkbox" checked>OCR前过滤红笔</label>
+ <button id="ocrBtn" class="btn-primary">识别当前页文字</button>
+ <button id="strikeBtn">发现红笔划除候选</button>
+ <label>本地视觉模型<input id="visionModel" value="qwen3-vl:4b" title="需要单独安装Ollama及视觉模型" style="max-width:125px"></label>
+ <button id="visionBtn">AI理解复杂修改（可选）</button>
+ <span id="engineStatus" class="small gray"></span>
+</section>
+<div class="statusrow"><span id="status" role="status" aria-live="polite">导入一张图片或加载演示项目。</span></div>
+<div class="main-grid">
+ <section class="panel">
+  <div class="panel-head"><div><h2>01 · 图片与证据位置</h2><p>点击文字框选中；拖拽绿色选区添加正文框、划线证据或限制OCR范围。</p></div><span id="imgInfo" class="tag">尚无图片</span></div>
+  <div class="canvas-wrap"><canvas id="pageCanvas" width="950" height="560" aria-label="手稿图片与标注画布"></canvas></div>
+  <div class="legend"><span><i class="dot dot-blue"></i>OCR/正文框</span><span><i class="dot dot-gold"></i>选中</span><span><i class="dot dot-green"></i>待确认选区</span><span><i class="dot dot-red"></i>修改笔迹</span></div>
+  <div class="callout">系统不会直接把红字或划线当成定稿：自动候选默认待确认。OCR覆盖既有文字框前会要求确认。可先只识别框定的正文区域，避免把标题与边注混入正文。</div>
+  <div class="control"><h3>增加正文框</h3>
+    <div class="input-grid"><label>原始文字<input id="newText" placeholder="请输入照片中的原文"></label><label>行号（0开始）<input id="newLine" type="number" min="0" value="0"></label></div>
+    <button id="addTokenBtn" class="btn-primary">用绿色选区创建文字片段</button>
+  </div>
+ </section>
+ <section class="panel">
+  <div class="panel-head"><div><h2>02 · 文字识别与核对</h2><p>更正OCR文本只影响原始转写；替换、删除等变动必须创建修改事件。</p></div><span class="tag" id="tokenCount">0 片段</span></div>
+  <div class="entries" id="tokens"></div>
+  <div class="control"><h3>文字框拆分（按子串）</h3>
+  <p class="hint">适用于OCR整句成框又需要定位单词的情况。也可以不拆框，直接在下方选择具体的修改子串。</p>
+  <div class="inline-form"><input id="splitNeedle" placeholder="例如：很好"><button id="splitBtn">拆分选中片段</button></div></div>
+  <div class="control"><h3>录入手写修改</h3>
+    <div class="input-grid"><label>目标文字框<select id="editTarget"></select></label>
+    <label>动作<select id="editOp"><option value="replace">替换</option><option value="delete">删除</option><option value="insert_before">在目标子串前插入</option><option value="insert_after">在目标子串后插入</option></select></label></div>
+    <label>原文中被修改的部分（不填则针对整个框）<input id="editNeedle" placeholder="例如：很好；可以精确到一句中的两个字"></label>
+    <label>新文字<input id="editText" placeholder="例如：不错"></label>
+    <div class="inline-form"><button id="addEditBtn" class="btn-primary">确认并记录修改</button><span class="hint">如已框选红色笔迹，证据坐标随记录保存</span></div>
+  </div>
+  <div class="control"><h3>修改事件 <span class="gray small" id="editCount"></span></h3><div class="entries" id="edits"></div></div>
+ </section>
+</div>
+<section class="panel results">
+ <div class="panel-head"><div><h2>03 · 可追溯的双版本</h2><p>左侧保留原稿；右侧只应用已确认的编辑操作。页面在导出时按顺序合并。</p></div><span class="tag" id="resultStatus">未生成</span></div>
+ <div class="result-grid"><div><h3>全部页面：原稿转写</h3><pre id="original">—</pre></div><div><h3>全部页面：终稿</h3><pre id="final">—</pre></div></div>
+ <details id="visionDetails" class="review-details" hidden><summary>查看当前页视觉AI的无法定位修改、存疑字词及参考转写</summary><pre id="visionSummary"></pre></details>
+ <div class="inline-form"><button id="saveOriginal">下载原稿 TXT</button><button id="saveFinal" class="btn-primary">下载终稿 TXT</button><button id="saveRecords">下载修改轨迹 JSON</button><button id="saveReport">下载质量与待审报告</button></div>
+ <p class="footnote">对于被严重划除的字、移动箭头、黑色涂改和复杂版式，系统可能无法自动正确解释，必须依据图片人工核对。红笔检测仅为低置信度候选。扫描内容只在你的电脑上处理，但你需要自行安装本地OCR依赖。</p>
+</section>
+<dialog id="projectsDialog" class="dialog"><div class="dialog-head"><h2>本地项目</h2><button id="closeDialog">关闭</button></div><div id="savedProjects" class="entries"></div></dialog>
+</main><footer>ManuscriptRestorer 1.0 · 开源技术构建 · 审计式修改事件 · 本地优先</footer>
+</body></html>

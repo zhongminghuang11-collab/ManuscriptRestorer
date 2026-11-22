@@ -1,0 +1,4 @@
+# Install requirements.txt first. PaddleOCR requires PaddlePaddle compatible with your OS/Python.
+# Follow https://www.paddleocr.ai/latest/en/quick_start.html
+# Example for compatible Python CPU environments:
+paddleocr>=3.0,<4

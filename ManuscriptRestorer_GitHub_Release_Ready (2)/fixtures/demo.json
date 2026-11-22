@@ -1,0 +1,177 @@
+{
+  "schema_version": "0.1",
+  "tokens": [
+    {
+      "id": "t1",
+      "text": "今天",
+      "line": 0,
+      "order": 0,
+      "bbox": [
+        52,
+        146,
+        166,
+        209
+      ],
+      "source": "synthetic"
+    },
+    {
+      "id": "t2",
+      "text": "天气",
+      "line": 0,
+      "order": 1,
+      "bbox": [
+        170,
+        146,
+        284,
+        209
+      ],
+      "source": "synthetic"
+    },
+    {
+      "id": "t3",
+      "text": "很好",
+      "line": 0,
+      "order": 2,
+      "bbox": [
+        288,
+        146,
+        402,
+        209
+      ],
+      "source": "synthetic"
+    },
+    {
+      "id": "t4",
+      "text": "，我决定",
+      "line": 0,
+      "order": 3,
+      "bbox": [
+        406,
+        146,
+        634,
+        209
+      ],
+      "source": "synthetic"
+    },
+    {
+      "id": "t5",
+      "text": "出去走走",
+      "line": 0,
+      "order": 4,
+      "bbox": [
+        638,
+        146,
+        866,
+        209
+      ],
+      "source": "synthetic"
+    },
+    {
+      "id": "t6",
+      "text": "。",
+      "line": 0,
+      "order": 5,
+      "bbox": [
+        870,
+        146,
+        927,
+        209
+      ],
+      "source": "synthetic"
+    },
+    {
+      "id": "t7",
+      "text": "晚上",
+      "line": 1,
+      "order": 0,
+      "bbox": [
+        52,
+        311,
+        166,
+        374
+      ],
+      "source": "synthetic"
+    },
+    {
+      "id": "t8",
+      "text": "还要",
+      "line": 1,
+      "order": 1,
+      "bbox": [
+        170,
+        311,
+        284,
+        374
+      ],
+      "source": "synthetic"
+    },
+    {
+      "id": "t9",
+      "text": "开会",
+      "line": 1,
+      "order": 2,
+      "bbox": [
+        288,
+        311,
+        402,
+        374
+      ],
+      "source": "synthetic"
+    },
+    {
+      "id": "t10",
+      "text": "。",
+      "line": 1,
+      "order": 3,
+      "bbox": [
+        406,
+        311,
+        463,
+        374
+      ],
+      "source": "synthetic"
+    }
+  ],
+  "edits": [
+    {
+      "id": "e1",
+      "op": "replace",
+      "target_id": "t3",
+      "text": "不错",
+      "status": "confirmed",
+      "source": "human-reviewed"
+    },
+    {
+      "id": "e2",
+      "op": "insert_before",
+      "target_id": "t5",
+      "text": "顺便",
+      "status": "confirmed",
+      "source": "human-reviewed"
+    },
+    {
+      "id": "e3",
+      "op": "replace",
+      "target_id": "t5",
+      "text": "出去散步",
+      "status": "confirmed",
+      "source": "human-reviewed"
+    },
+    {
+      "id": "e4",
+      "op": "delete",
+      "target_id": "t8",
+      "text": "",
+      "status": "confirmed",
+      "source": "human-reviewed"
+    },
+    {
+      "id": "e5",
+      "op": "replace",
+      "target_id": "t9",
+      "text": "写稿",
+      "status": "confirmed",
+      "source": "human-reviewed"
+    }
+  ]
+}
